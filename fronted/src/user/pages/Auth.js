@@ -69,7 +69,7 @@ const Auth = () => {
                 )
                 Auth.setUpvotes(responseData.upvotes) 
                 Auth.setDownvotes(responseData.downvotes)
-                Auth.login(responseData.userId, responseData.token)
+                Auth.login(responseData.userId, responseData.token, responseData.upvotes, responseData.downvotes)
             }
             catch(err){
                 console.log(err)

@@ -70,6 +70,10 @@
   text-align: center;
 }
 
+.place__post-options:hover{
+  cursor: pointer;
+}
+
 p.place__post-options {
   font-size: 20px;
   font-weight: bolder;

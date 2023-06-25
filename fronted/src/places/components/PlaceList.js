@@ -1,11 +1,15 @@
-import React from "react"; 
+import React, { useContext } from "react"; 
 
 import "./PlaceList.css"
 
 import PlaceItem from "./PlaceItem";
+import { AuthContext } from "../../shared/context/auth-context";
+
 
 
 const PlaceList = props => {
+    const auth = useContext(AuthContext)
+    
     return(
         <ul className="places-list">
             {props.user.map(place => {

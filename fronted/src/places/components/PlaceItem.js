@@ -27,24 +27,29 @@ const PlaceItem = props => {
 
     const openMapHandler = () => setShowMap(true)
     const closeMapHandler = () => setShowMap(false)
-
     const upvoteHandler = async (actionType) => {
+        const existingUpvotes = JSON.parse(localStorage.getItem('UserInfo')).upvotes;
+        const existingDownvotes = JSON.parse(localStorage.getItem('UserInfo')).downvotes;
         try{
             let voteMethod;
             if (actionType === "UPVOTE") {
                 if (isUpvote && !isDownvote) {
                     voteMethod = "REMOVE UPVOTE"
+                    existingUpvotes.pull(props.id)
                     setIsUpvote(false)
                     setIsDownvote(false)
                     setUpvotes(prevState => prevState - 1)
                 }
                 else if (isDownvote && !isUpvote) {
                     voteMethod =  "REMOVE DOWNVOTE ADD UPVOTE"
+                    existingDownvotes.pull(props.id)
+                    existingUpvotes.push(props.id)
                     setIsUpvote(true)
                     setIsDownvote(false)
                     setUpvotes(prevState => prevState + 2)
                 }
                 else{
+                    existingUpvotes.push(props.id)
                     voteMethod = "ADD UPVOTE"
                     setUpvotes(prevState => prevState + 1)
                     setIsUpvote(true)
@@ -54,11 +59,14 @@ const PlaceItem = props => {
             else{
                 if (isUpvote  && !isDownvote) {
                     voteMethod =  "ADD DOWNVOTE REMOVE UPVOTE"
+                    existingDownvotes.push(props.id)
+                    existingUpvotes.pull(props.id)
                     setUpvotes(prevState => prevState - 2)
                     setIsDownvote(true)
                     setIsUpvote(false)
                 }
                 else if (isDownvote && !isUpvote) {
+                    existingDownvotes.pull(props.id)
                     voteMethod = "REMOVE DOWNVOTE"
                     setIsDownvote(false)
                     setIsUpvote(false)
@@ -66,12 +74,21 @@ const PlaceItem = props => {
                 }
                 else{
                     voteMethod = "ADD DOWNVOTE"
+                    existingDownvotes.push(props.id)
                     setIsDownvote(true)
                     setIsUpvote(false)
                     setUpvotes(prevState=>prevState-1)
                     
                 }
             }
+            localStorage.setItem(
+                "UserInfo", 
+                JSON.stringify({
+                  upvotes: existingUpvotes,
+                  downvotes: existingDownvotes,
+                })
+              )
+              console.log("Upvote Action")
             await sendRequest(`http://localhost:5000/api/places/${props.id}/upvote`,
                 "POST",
                 JSON.stringify({

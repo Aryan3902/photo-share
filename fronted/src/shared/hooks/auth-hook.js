@@ -7,16 +7,21 @@ export const useAuth = () => {
   const [token, setToken] = useState(false);
   const [userId, setUserId] = useState(null);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
+  const [upvotes, setUpvotes] = useState([])
+  const [downvotes, setDownvotes] = useState([])
 
-  const Login = useCallback((uid, token, expirationDate) => {
+  const Login = useCallback((uid, token, upvotes = [], downvotes = [], expirationDate) => {
     // For token expiration, we maintain a token expiration date in our fronted
     // and check for the timer, the below expiration creates a new Date which is
     // 1 hr after the current time
-    const tokenExpirationDate =
-      expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
+    const tokenExpirationDate = expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
     setTokenExpirationDate(tokenExpirationDate);
     setToken(token);
     setUserId(uid);
+    setUpvotes(upvotes)
+    setDownvotes(downvotes)
+    // console.log(upvotes)
+    // console.log(downvotes)
     // To local storage we can only write text or data that can be converted to text
     // Hence we use stringify
     localStorage.setItem(
@@ -24,16 +29,26 @@ export const useAuth = () => {
       JSON.stringify({
         userId: uid,
         token,
-        expiration: tokenExpirationDate.toISOString(),
+        expiration: tokenExpirationDate.toISOString()
       })
     );
+    localStorage.setItem(
+      "UserInfo", 
+      JSON.stringify({
+        upvotes: upvotes,
+        downvotes: downvotes,
+      })
+    )
   }, []);
 
   const Logout = useCallback(() => {
     setToken(null);
     setTokenExpirationDate(null);
     setUserId(null);
+    setUpvotes([])
+    setDownvotes([])
     localStorage.removeItem("UserData");
+    localStorage.removeItem("UserInfo");
   }, []);
 
   useEffect(() => {
@@ -53,7 +68,8 @@ export const useAuth = () => {
     // useEffect runs after the render cycle, when the components fully loads
     // We can add a state to confirm the useEffect has completed its work
     // and meanwhile we can show some other page
-    const storedData = JSON.parse(localStorage.getItem("UserData"));
+    const storedData = JSON.parse(localStorage.getItem("UserData"))
+    const storedUserData = JSON.parse(localStorage.getItem("UserInfo"));
     if (
       storedData &&
       storedData.token &&
@@ -65,7 +81,9 @@ export const useAuth = () => {
       Login(
         storedData.userId,
         storedData.token,
-        new Date(storedData.expiration)
+        storedUserData.upvotes,
+        storedUserData.downvotes,
+        new Date(storedData.expiration),
       );
     }
   }, [Login]);
@@ -74,6 +92,10 @@ export const useAuth = () => {
     token,
     Login,
     Logout,
-    userId
+    userId,
+    upvotes,
+    downvotes,
+    setUpvotes,
+    setDownvotes
   }
 };

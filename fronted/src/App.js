@@ -13,9 +13,8 @@ import Auth from './user/pages/Auth';
 import { useAuth } from './shared/hooks/auth-hook';
 
 function App() {
-  const {token, Login, Logout, userId} = useAuth()
-  const [upvotes, setUpvotes] = useState([])
-  const [downvotes, setDownvotes] = useState([])
+  const {token, Login, Logout, userId, upvotes, downvotes, setDownvotes, setUpvotes} = useAuth()
+  
   let routes;
 
   if(token){

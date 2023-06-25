@@ -5,6 +5,7 @@ const User = require("../models/user")
 
 const {validationResult} = require("express-validator")
 const mongoose  = require("mongoose")
+const { error } = require("console")
 
 const getPlacebyId = async (req, res, next) => {
     const placeId = req.params.pid
@@ -95,10 +96,20 @@ const upvotePlace = async(req, res, next) => {
     const placeId = req.params.pid
     let place
     try{
-        place = await Place.findById(placeId).populate('creator')
+        place = await Place.findById(placeId)
         // console.log(place)
     }
     catch{
+        return next(new HttpError("Something went wrong, could not upvote this place.", 500))
+    }
+
+    let user
+    try{
+        user = await User.findById(req.userData.userId)
+        if (!user) {
+            throw error;
+        }
+    }catch{
         return next(new HttpError("Something went wrong, could not upvote this place.", 500))
     }
 
@@ -115,34 +126,34 @@ const upvotePlace = async(req, res, next) => {
         session.startTransaction();
         switch (req.body.actionType) {
             case "ADD UPVOTE":
-                place.creator.postsUpvoted.push(placeId)
+                user.postsUpvoted.push(placeId)
                 place.Upvotes++;
                 break;
 
             case "REMOVE UPVOTE":
-                place.creator.postsUpvoted.pull(placeId)
+                user.postsUpvoted.pull(placeId)
                 place.Upvotes--;
                 break;
 
             case "REMOVE DOWNVOTE ADD UPVOTE":
-                place.creator.postsUpvoted.push(placeId)
-                place.creator.postsDownvoted.pull(placeId)
+                user.postsUpvoted.push(placeId)
+                user.postsDownvoted.pull(placeId)
                 place.Upvotes+=2;
                 break;
 
             case "ADD DOWNVOTE REMOVE UPVOTE":
-                place.creator.postsDownvoted.push(placeId)
-                place.creator.postsUpvoted.pull(placeId)
+                user.postsDownvoted.push(placeId)
+                user.postsUpvoted.pull(placeId)
                 place.Upvotes-=2;
                 break;
                 
             case "REMOVE DOWNVOTE":
-                place.creator.postsDownvoted.pull(placeId)
+                user.postsDownvoted.pull(placeId)
                 place.Upvotes++;
                 break;
 
             case "ADD DOWNVOTE":
-                place.creator.postsDownvoted.push(placeId)
+                user.postsDownvoted.push(placeId)
                 place.Upvotes--;
                 break;
 
@@ -150,7 +161,7 @@ const upvotePlace = async(req, res, next) => {
                 break;
         }
         await place.save()
-        await place.creator.save({session: session})
+        await user.save({session: session})
         await session.commitTransaction()
     }
     catch(err){
@@ -214,7 +225,8 @@ const deletePlace = async (req, res, next) => {
         return next(new HttpError("Something went wrong, could not delete the place.", 500))
     }
 
-    if (place.creator.toString() !== req.userData.userId) {
+    if (place.creator.id !== req.userData.userId) {
+       
         return next(new HttpError("Invalid user! You are not allowed to update this place.", 401))
     }
 
