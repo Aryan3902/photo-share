@@ -10,6 +10,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import ErrorModal from "../../shared/Components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/Components/UIElements/LoadingSpinner";
 import ImageUpload from "../../shared/Components/FormElements/ImageUpload";
+import { toast } from "react-toastify";
 
 function NewPlace(props){
     const auth = useContext(AuthContext)
@@ -39,11 +40,17 @@ function NewPlace(props){
             formData.append('caption', formState.inputs.Caption.value)
             formData.append('name', formState.inputs.Location.value)
             formData.append('image', formState.inputs.image.value)
-            await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/places/`, "POST", 
+            await toast.promise(sendRequest(`${process.env.REACT_APP_BACKEND_URL}/places/`, "POST", 
             formData,
             {
                 Authorization: 'Bearer ' + auth.token
             }
+            ),
+            {
+                pending: `Visiting ${formState.inputs.Location.value}...`,
+                success: `<p>Congratulations! Your new place, ${formState.inputs.Location.value}, has been added to our social map.`,
+                error: 'Creating Place failed! 😢'
+              }
             )
         navigate("/" + auth.userId + "/place")
         }

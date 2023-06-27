@@ -12,7 +12,8 @@ import Clock from './shared/Components/Clock/Clock';
 // import Auth from './user/pages/Auth';
 import { useAuth } from './shared/hooks/auth-hook';
 import LoadingSpinner from './shared/Components/UIElements/LoadingSpinner';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const Users = React.lazy(() => import("./user/pages/Users"))
 const NewPlace = React.lazy(() => import("./places/pages/NewPlace"))
 const UserPlace = React.lazy(() => import("./places/pages/UserPlace"))
@@ -62,6 +63,7 @@ function App() {
     <AuthContext.Provider value={{isLoggedin: !!token, token: token, userId: userId, login: Login, logout: Logout}}>
       <Router>
         <NavMain/>
+        <ToastContainer style={{marginTop: "5rem"}}/>
         <Routes>
             {routes}
         </Routes>

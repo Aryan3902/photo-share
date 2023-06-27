@@ -12,12 +12,13 @@ import LoadingSpinner from '../../shared/Components/UIElements/LoadingSpinner'
 import ErrorModal from '../../shared/Components/UIElements/ErrorModal'
 import { useHttpClient } from '../../shared/hooks/http-hook'
 import ImageUpload from '../../shared/Components/FormElements/ImageUpload'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 const Auth = () => {
     const Auth = useContext(AuthContext)
     const [isLoginMode, setIsLoginMode] = useState(true)
     const {isLoading ,error, sendRequest, clearError} = useHttpClient()
-
     const [formState, InputHandler, setFormValue] = useForm({
         Email:{
             value: '',
@@ -57,7 +58,7 @@ const Auth = () => {
 
         if (isLoginMode) {
             try{
-                const responseData = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/login`, 
+                const responseData = await toast.promise(sendRequest(`${process.env.REACT_APP_BACKEND_URL}/users/login`, 
                 'POST',
                 JSON.stringify({
                     email: formState.inputs.Email.value,
@@ -66,8 +67,13 @@ const Auth = () => {
                 {
                     'Content-Type': 'application/json'
                 }
+                ),
+                {
+                    pending: 'Logging in...',
+                    success: `Logged In! 👌`,
+                    error: 'Logging In failed! 🤯'
+                  }
                 )
-                
                 Auth.login(responseData.userId, responseData.token)
             }
             catch(err){
