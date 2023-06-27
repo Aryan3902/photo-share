@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 import Users from './user/pages/Users';
 import NewPlace from './places/pages/NewPlace';
 import './App.css';
-import { AuthContext } from './shared/context/auth-context';
 import NavMain from './shared/Components/NavElements/MainNavigation';
 import Clock from './shared/Components/Clock/Clock';
 import UserPlaces from './places/pages/UserPlaces';
@@ -11,6 +10,9 @@ import UserPlace from './places/pages/UserPlace';
 import UpdatePlace from './places/pages/UpdatePlace';
 import Auth from './user/pages/Auth';
 import { useAuth } from './shared/hooks/auth-hook';
+
+import { AuthContext } from './shared/context/auth-context';
+import { UserContext } from './shared/context/user-context';
 
 function App() {
   const {token, Login, Logout, userId, upvotes, downvotes, setDownvotes, setUpvotes} = useAuth()
@@ -41,7 +43,8 @@ function App() {
   }
 
   return (
-    <AuthContext.Provider value={{isLoggedin: !!token, token: token, userId: userId, login: Login, logout: Logout, upVotes: upvotes, downVotes: downvotes, setDownvotes: setDownvotes, setUpvotes: setUpvotes}}>
+    <AuthContext.Provider value={{isLoggedin: !!token, token: token, userId: userId, login: Login, logout: Logout}}>
+      <UserContext.Provider value={{upVotes: upvotes, downVotes: downvotes, setDownvotes: setDownvotes, setUpvotes: setUpvotes}}>
       <Router>
         <NavMain/>
         <Routes>
@@ -49,6 +52,7 @@ function App() {
         </Routes>
         <Clock/>
       </Router>
+      </UserContext.Provider>
     </AuthContext.Provider>
   );
 }

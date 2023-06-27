@@ -7,10 +7,10 @@ export const useAuth = () => {
   const [token, setToken] = useState(false);
   const [userId, setUserId] = useState(null);
   const [tokenExpirationDate, setTokenExpirationDate] = useState();
-  const [upvotes, setUpvotes] = useState([])
-  const [downvotes, setDownvotes] = useState([])
+  const [upvotes, setUpvotes] = useState(new Set())
+  const [downvotes, setDownvotes] = useState(new Set())
 
-  const Login = useCallback((uid, token, upvotes = [], downvotes = [], expirationDate) => {
+  const Login = useCallback((uid, token, upvotes = new Set(), downvotes = new Set(), expirationDate) => {
     // For token expiration, we maintain a token expiration date in our fronted
     // and check for the timer, the below expiration creates a new Date which is
     // 1 hr after the current time
@@ -45,8 +45,8 @@ export const useAuth = () => {
     setToken(null);
     setTokenExpirationDate(null);
     setUserId(null);
-    setUpvotes([])
-    setDownvotes([])
+    setUpvotes(new Set())
+    setDownvotes(new Set())
     localStorage.removeItem("UserData");
     localStorage.removeItem("UserInfo");
   }, []);
@@ -70,6 +70,12 @@ export const useAuth = () => {
     // and meanwhile we can show some other page
     const storedData = JSON.parse(localStorage.getItem("UserData"))
     const storedUserData = JSON.parse(localStorage.getItem("UserInfo"));
+    console.log(typeof(storedUserData.downvotes))
+    console.log((Object.keys(storedUserData.upvotes)).length)
+
+    storedUserData.upvotes=new Set((Object.keys(storedUserData.upvotes)).length ? storedUserData.upvotes : storedUserData.upvotes.keys)
+    storedUserData.downvotes=new Set((Object.keys(storedUserData.downvotes)).length ? storedUserData.downvotes : storedUserData.downvotes.keys)
+    console.log(typeof(storedUserData.downvotes))
     if (
       storedData &&
       storedData.token &&

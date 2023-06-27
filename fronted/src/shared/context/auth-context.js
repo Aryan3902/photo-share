@@ -11,10 +11,6 @@ export const AuthContext = createContext({
     isLoggedin: false, 
     userId: null,
     token: null,
-    upVotes: [],
-    downVotes: [],
-    setUpvotes: () => {},
-    setDownvotes: () => {},
     login: () => {}, 
     logout: () => {}
 })

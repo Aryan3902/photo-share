@@ -10,16 +10,18 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 
 import "./PlaceItem.css"
 import { AuthContext } from "../../shared/context/auth-context";
+import { UserContext } from "../../shared/context/user-context";
 
 const PlaceItem = props => {
     const auth = useContext(AuthContext)
-    
+    const userDetails = useContext(UserContext)
     const {isLoading,error, sendRequest, clearError} = useHttpClient();
 
     const [showMap, setShowMap] =useState(false);
     const [deleteMessage, setDeleteMessage] = useState(false)
-    const [isUpvote, setIsUpvote] = useState(auth.upVotes.includes(props.id))
-    const [isDownvote, setIsDownvote] = useState(auth.downVotes.includes(props.id))
+    console.log(userDetails)
+    const [isUpvote, setIsUpvote] = useState(userDetails.upVotes.has(props.id))
+    const [isDownvote, setIsDownvote] = useState(userDetails.downVotes.has(props.id))
     const [upvotes, setUpvotes] = useState(props.upvotes)
 
     const opendeleteMessageHandler = () => setDeleteMessage(true)
@@ -28,28 +30,28 @@ const PlaceItem = props => {
     const openMapHandler = () => setShowMap(true)
     const closeMapHandler = () => setShowMap(false)
     const upvoteHandler = async (actionType) => {
-        const existingUpvotes = JSON.parse(localStorage.getItem('UserInfo')).upvotes;
-        const existingDownvotes = JSON.parse(localStorage.getItem('UserInfo')).downvotes;
+        const existingUpvotes = userDetails.upVotes
+        const existingDownvotes = userDetails.downVotes
         try{
             let voteMethod;
             if (actionType === "UPVOTE") {
                 if (isUpvote && !isDownvote) {
                     voteMethod = "REMOVE UPVOTE"
-                    existingUpvotes.pull(props.id)
+                    existingUpvotes.delete(props.id)
                     setIsUpvote(false)
                     setIsDownvote(false)
                     setUpvotes(prevState => prevState - 1)
                 }
                 else if (isDownvote && !isUpvote) {
                     voteMethod =  "REMOVE DOWNVOTE ADD UPVOTE"
-                    existingDownvotes.pull(props.id)
-                    existingUpvotes.push(props.id)
+                    existingDownvotes.delete(props.id)
+                    existingUpvotes.add(props.id)
                     setIsUpvote(true)
                     setIsDownvote(false)
                     setUpvotes(prevState => prevState + 2)
                 }
                 else{
-                    existingUpvotes.push(props.id)
+                    existingUpvotes.add(props.id)
                     voteMethod = "ADD UPVOTE"
                     setUpvotes(prevState => prevState + 1)
                     setIsUpvote(true)
@@ -59,14 +61,14 @@ const PlaceItem = props => {
             else{
                 if (isUpvote  && !isDownvote) {
                     voteMethod =  "ADD DOWNVOTE REMOVE UPVOTE"
-                    existingDownvotes.push(props.id)
-                    existingUpvotes.pull(props.id)
+                    existingDownvotes.add(props.id)
+                    existingUpvotes.delete(props.id)
                     setUpvotes(prevState => prevState - 2)
                     setIsDownvote(true)
                     setIsUpvote(false)
                 }
                 else if (isDownvote && !isUpvote) {
-                    existingDownvotes.pull(props.id)
+                    existingDownvotes.delete(props.id)
                     voteMethod = "REMOVE DOWNVOTE"
                     setIsDownvote(false)
                     setIsUpvote(false)
@@ -74,7 +76,7 @@ const PlaceItem = props => {
                 }
                 else{
                     voteMethod = "ADD DOWNVOTE"
-                    existingDownvotes.push(props.id)
+                    existingDownvotes.add(props.id)
                     setIsDownvote(true)
                     setIsUpvote(false)
                     setUpvotes(prevState=>prevState-1)
@@ -100,7 +102,7 @@ const PlaceItem = props => {
             })
         }
         catch(err){
-
+            console.log(err)
         }
     }
 

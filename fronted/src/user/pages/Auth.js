@@ -8,6 +8,8 @@ import { useForm } from '../../shared/hooks/form-hook'
 
 import "./Auth.css"
 import { AuthContext } from '../../shared/context/auth-context'
+import { UserContext } from '../../shared/context/user-context'
+
 import LoadingSpinner from '../../shared/Components/UIElements/LoadingSpinner'
 import ErrorModal from '../../shared/Components/UIElements/ErrorModal'
 import { useHttpClient } from '../../shared/hooks/http-hook'
@@ -15,6 +17,7 @@ import ImageUpload from '../../shared/Components/FormElements/ImageUpload'
 
 const Auth = () => {
     const Auth = useContext(AuthContext)
+    const userDetails = useContext(UserContext)
     const [isLoginMode, setIsLoginMode] = useState(true)
     const {isLoading ,error, sendRequest, clearError} = useHttpClient()
 
@@ -67,8 +70,8 @@ const Auth = () => {
                     'Content-Type': 'application/json'
                 }
                 )
-                Auth.setUpvotes(responseData.upvotes) 
-                Auth.setDownvotes(responseData.downvotes)
+                userDetails.setUpvotes(responseData.upvotes) 
+                userDetails.setDownvotes(responseData.downvotes)
                 Auth.login(responseData.userId, responseData.token, responseData.upvotes, responseData.downvotes)
             }
             catch(err){
