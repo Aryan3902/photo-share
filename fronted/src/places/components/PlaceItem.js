@@ -10,16 +10,18 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 
 import "./PlaceItem.css"
 import { AuthContext } from "../../shared/context/auth-context";
+import { UserContext } from "../../shared/context/user-context";
 
 const PlaceItem = props => {
     const auth = useContext(AuthContext)
+    const UserDetails = useContext(UserContext)
     
     const {isLoading,error, sendRequest, clearError} = useHttpClient();
 
     const [showMap, setShowMap] =useState(false);
     const [deleteMessage, setDeleteMessage] = useState(false)
-    const [isUpvote, setIsUpvote] = useState(auth.upVotes.includes(props.id))
-    const [isDownvote, setIsDownvote] = useState(auth.downVotes.includes(props.id))
+    const [isUpvote, setIsUpvote] = useState(UserDetails.upVotes.includes(props.id))
+    const [isDownvote, setIsDownvote] = useState(UserDetails.downVotes.includes(props.id))
     const [upvotes, setUpvotes] = useState(props.upvotes)
 
     const opendeleteMessageHandler = () => setDeleteMessage(true)
@@ -28,21 +30,21 @@ const PlaceItem = props => {
     const openMapHandler = () => setShowMap(true)
     const closeMapHandler = () => setShowMap(false)
     const upvoteHandler = async (actionType) => {
-        const existingUpvotes = JSON.parse(localStorage.getItem('UserInfo')).upvotes;
-        const existingDownvotes = JSON.parse(localStorage.getItem('UserInfo')).downvotes;
+        let existingUpvotes = JSON.parse(localStorage.getItem('UserInfo')).upvotes;
+        let existingDownvotes = JSON.parse(localStorage.getItem('UserInfo')).downvotes;
         try{
             let voteMethod;
             if (actionType === "UPVOTE") {
                 if (isUpvote && !isDownvote) {
                     voteMethod = "REMOVE UPVOTE"
-                    existingUpvotes.pull(props.id)
+                    existingUpvotes = existingUpvotes.filter(element => element !==props.id)
                     setIsUpvote(false)
                     setIsDownvote(false)
                     setUpvotes(prevState => prevState - 1)
                 }
                 else if (isDownvote && !isUpvote) {
                     voteMethod =  "REMOVE DOWNVOTE ADD UPVOTE"
-                    existingDownvotes.pull(props.id)
+                    existingDownvotes = existingDownvotes.filter(element => element !==props.id)
                     existingUpvotes.push(props.id)
                     setIsUpvote(true)
                     setIsDownvote(false)
@@ -60,13 +62,13 @@ const PlaceItem = props => {
                 if (isUpvote  && !isDownvote) {
                     voteMethod =  "ADD DOWNVOTE REMOVE UPVOTE"
                     existingDownvotes.push(props.id)
-                    existingUpvotes.pull(props.id)
+                    existingUpvotes = existingUpvotes.filter(element => element !==props.id)
                     setUpvotes(prevState => prevState - 2)
                     setIsDownvote(true)
                     setIsUpvote(false)
                 }
                 else if (isDownvote && !isUpvote) {
-                    existingDownvotes.pull(props.id)
+                    existingDownvotes = existingDownvotes.filter(element => element !==props.id)
                     voteMethod = "REMOVE DOWNVOTE"
                     setIsDownvote(false)
                     setIsUpvote(false)
@@ -88,7 +90,6 @@ const PlaceItem = props => {
                   downvotes: existingDownvotes,
                 })
               )
-              console.log("Upvote Action")
             await sendRequest(`http://localhost:5000/api/places/${props.id}/upvote`,
                 "POST",
                 JSON.stringify({
