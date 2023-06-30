@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {useNavigate} from "react-router-dom"
 import Button from "../../shared/Components/FormElements/Button";
 import Input from "../../shared/Components/FormElements/Input";
@@ -10,10 +10,13 @@ import { AuthContext } from "../../shared/context/auth-context";
 import ErrorModal from "../../shared/Components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/Components/UIElements/LoadingSpinner";
 import ImageUpload from "../../shared/Components/FormElements/ImageUpload";
+import { useGpt } from "../../shared/hooks/gpt-hook";
 
 function NewPlace(props){
     const auth = useContext(AuthContext)
     const {isLoading, clearError, error, sendRequest} = useHttpClient();
+    const {clearCaptionError, isCaptionError, isCaptionLoading, fetchedData, generateCaptions} = useGpt()
+    const [AICaptions, setAICaptions] = useState(false)
 
     const [formState, InputHandler] = useForm({
         Caption:{
@@ -29,6 +32,11 @@ function NewPlace(props){
             isValid: false
         }
     }, false)
+
+    const captionSuggestions = () => {
+        setAICaptions(true) 
+        generateCaptions(formState.inputs.Location.value)
+    }
 
     const navigate = useNavigate();
 
@@ -57,6 +65,7 @@ function NewPlace(props){
     return(
     <>
         <ErrorModal error={error} onClear={clearError}/>
+        <ErrorModal error={isCaptionError} onClear={clearCaptionError}/>
         <form className="place-form" onSubmit={submitHandler}>
             {isLoading && <LoadingSpinner className="center" isOverlay/>}
             <ImageUpload center id="image" onInput={InputHandler}/>
@@ -77,6 +86,17 @@ function NewPlace(props){
                 validators={[VALIDATOR_REQUIRE()]}
                 onInput={InputHandler}
             />
+            
+                
+                {isCaptionLoading && <LoadingSpinner className="center" isOverlay/>}
+                {!isCaptionLoading && fetchedData && fetchedData}
+
+                
+           
+             <div className={`animated-div ${AICaptions && "expanded"}`}></div>
+            <Button type="button" disabled={formState.inputs.Location.value.length < 3} cool onClick={captionSuggestions}>
+                Suggest Caption!
+            </Button>
             <Button type="submit" disabled={!formState.isValid}>
                 Add New Place
             </Button>

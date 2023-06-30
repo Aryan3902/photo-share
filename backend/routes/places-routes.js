@@ -13,7 +13,7 @@ router.get("/:pid", placesController.getPlacebyId)
 // Middleware to check for a valid incoming token and stop the url checking from below here if a token doesn't exist
 router.use(checkAuth)
 
-router.post("/",fileUpload.single('image'),[check('name').not().isEmpty(), check('caption').not().isEmpty()], placesController.createPlace)
+router.post("/",fileUpload.single('image'),[check('name'), check('caption').not().isEmpty()], placesController.createPlace)
 
 router.patch("/:pid",[check('name').not().isEmpty(), check('caption').not().isEmpty()], placesController.updatePlace)
 
