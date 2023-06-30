@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 // import Users from './user/pages/Users';
 // import NewPlace from './places/pages/NewPlace';
@@ -30,8 +30,22 @@ export const SuspenseElement = (props) => {
 
 function App() {
   const {token, Login, Logout, userId} = useAuth()
-
   let routes;
+  useEffect(() => {
+    async function IPreset(){
+      try{
+        const response = await fetch(`${process.env.REACT_APP_CHATGPT_API_URL}/resetip`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer pk-FIrqBExccQGMKESddpMGaGiOafkvSYqBccLpxzEwiEhyKSri'
+          }
+        });
+      }catch{
+      }
+    }
+    IPreset()
+  }, [])
+  
 
   if(token){
     routes= (

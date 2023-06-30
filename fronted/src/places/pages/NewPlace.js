@@ -11,13 +11,17 @@ import ErrorModal from "../../shared/Components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/Components/UIElements/LoadingSpinner";
 import ImageUpload from "../../shared/Components/FormElements/ImageUpload";
 import { useGpt } from "../../shared/hooks/gpt-hook";
+import { CaptionList } from "../components/CaptionList";
 
 function NewPlace(props){
     const auth = useContext(AuthContext)
     const {isLoading, clearError, error, sendRequest} = useHttpClient();
-    const {clearCaptionError, isCaptionError, isCaptionLoading, fetchedData, generateCaptions} = useGpt()
+    const {clearCaptionError, isCaptionLoading, fetchedData, generateCaptions} = useGpt()
+    let {CaptionError} = useGpt()
     const [AICaptions, setAICaptions] = useState(false)
-
+   if (CaptionError && CaptionError.includes("IP")) {
+     CaptionError="Something Went wrong, Pls try later"
+   }
     const [formState, InputHandler] = useForm({
         Caption:{
             value: '',
@@ -65,9 +69,9 @@ function NewPlace(props){
     return(
     <>
         <ErrorModal error={error} onClear={clearError}/>
-        <ErrorModal error={isCaptionError} onClear={clearCaptionError}/>
+        <ErrorModal error={CaptionError} onClear={clearCaptionError}/>
         <form className="place-form" onSubmit={submitHandler}>
-            {isLoading && <LoadingSpinner className="center" isOverlay/>}
+            {isLoading && <LoadingSpinner className="center" asOverlay/>}
             <ImageUpload center id="image" onInput={InputHandler}/>
             <Input 
                 id="Location"
@@ -88,12 +92,11 @@ function NewPlace(props){
             />
             
                 
-                {isCaptionLoading && <LoadingSpinner className="center" isOverlay/>}
-                {!isCaptionLoading && fetchedData && fetchedData}
+                {isCaptionLoading && <LoadingSpinner className="center" asOverlay/>}
+                {!isCaptionLoading && fetchedData && <CaptionList captions={fetchedData}/>}
 
                 
            
-             <div className={`animated-div ${AICaptions && "expanded"}`}></div>
             <Button type="button" disabled={formState.inputs.Location.value.length < 3} cool onClick={captionSuggestions}>
                 Suggest Caption!
             </Button>
