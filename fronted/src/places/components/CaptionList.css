@@ -1,0 +1,40 @@
+.caption-lists{
+    list-style: none;
+    margin-bottom: 20px;
+    background: rgb(170, 255, 214);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.caption-item__text{
+    color: rgb(0, 80, 156);
+    font-weight: 600;
+    margin: 10px;
+    flex: 12;
+    width: 40%;
+}
+
+.caption-item__container{
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.88);
+    border: rgb(0, 56, 8) solid 1px;
+    border-radius: 20px;
+    margin: 10px;
+    padding: 5px;
+}
+
+.caption-item__icon__container{
+    display: flex;
+    justify-content: center;
+    flex: 2;
+}
+
+.caption-item__icon{
+    transition: transform 0.2s ease-out;
+}
+
+.caption-item__icon:hover{
+    cursor: pointer;
+    transform: scale(1.4);
+}
