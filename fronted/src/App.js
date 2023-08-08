@@ -13,6 +13,8 @@ import { useAuth } from './shared/hooks/auth-hook';
 import LoadingSpinner from './shared/Components/UIElements/LoadingSpinner';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { UserContext } from './shared/context/user-context';
+import { AuthContext } from './shared/context/auth-context';
 const Users = React.lazy(() => import("./user/pages/Users"))
 const NewPlace = React.lazy(() => import("./places/pages/NewPlace"))
 const UserPlace = React.lazy(() => import("./places/pages/UserPlace"))
@@ -27,9 +29,6 @@ export const SuspenseElement = (props) => {
     </Suspense>
   )
 }
-
-import { UserContext } from './shared/context/user-context';
-import { AuthContext } from './shared/context/auth-context';
 
 
 function App() {

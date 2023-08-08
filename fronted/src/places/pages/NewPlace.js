@@ -48,7 +48,7 @@ function NewPlace(props){
             ),
             {
                 pending: `Visiting ${formState.inputs.Location.value}...`,
-                success: `<p>Congratulations! Your new place, ${formState.inputs.Location.value}, has been added to our social map.`,
+                success: `Congratulations! Your new place, ${formState.inputs.Location.value}, has been added to our social map.`,
                 error: 'Creating Place failed! 😢'
               }
             )

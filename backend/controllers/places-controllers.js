@@ -166,7 +166,7 @@ const upvotePlace = async(req, res, next) => {
     }
     catch(err){
         console.log(err)
-        return next(new HttpError("Something went wrong, could not delete the place.", 500))
+        return next(new HttpError("Something went wrong, could not upvote the place.", 500))
     }
 
     res.status(200).json({"message": "Removed"})
