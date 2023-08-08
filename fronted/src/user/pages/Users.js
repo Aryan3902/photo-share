@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ErrorModal from "../../shared/Components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/Components/UIElements/LoadingSpinner";
-
 import UsersList from "../components/UsersList";
 
 const Users = () => {
@@ -36,6 +35,9 @@ const Users = () => {
           <LoadingSpinner />
         </div>
       )}
+     
+      
+      
       {!isLoading && loadedUsers && <UsersList items={loadedUsers} />}
     </>
   );
