@@ -27,6 +27,16 @@ const userSchema = new Schema({
     required: true,
     ref: "Place",
   }],
+  postsUpvoted: [{
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "Place"
+  }],
+  postsDownvoted: [{
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "Place"
+  }]
 });
 
 userSchema.plugin(uniqueValidator)

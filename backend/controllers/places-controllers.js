@@ -5,6 +5,7 @@ const User = require("../models/user")
 
 const {validationResult} = require("express-validator")
 const mongoose  = require("mongoose")
+const { error } = require("console")
 
 const getPlacebyId = async (req, res, next) => {
     const placeId = req.params.pid
@@ -56,7 +57,8 @@ const createPlace = async (req,res,next) => {
         name,
         caption,
         image: req.file.path,
-        creator: req.userData.userId
+        creator: req.userData.userId,
+        Upvotes: 0
     })
 
     // UserData[0].places.push(NewPlace)
@@ -88,6 +90,86 @@ const createPlace = async (req,res,next) => {
     }
 
     res.status(201).json({place: NewPlace})
+}
+
+const upvotePlace = async(req, res, next) => {
+    const placeId = req.params.pid
+    let place
+    try{
+        place = await Place.findById(placeId)
+        // console.log(place)
+    }
+    catch{
+        return next(new HttpError("Something went wrong, could not upvote this place.", 500))
+    }
+
+    let user
+    try{
+        user = await User.findById(req.userData.userId)
+        if (!user) {
+            throw error;
+        }
+    }catch{
+        return next(new HttpError("Something went wrong, could not upvote this place.", 500))
+    }
+
+    // if (place.creator.toString() !== req.userData.userId) {
+    //     return next(new HttpError("Invalid user! You are not allowed to update this place.", 401))
+    // }
+
+    if(!place){
+        return next(new HttpError("Could not find place for this id.", 404))
+    }
+
+    try{
+        const session = await mongoose.startSession()
+        session.startTransaction();
+        switch (req.body.actionType) {
+            case "ADD UPVOTE":
+                user.postsUpvoted.push(placeId)
+                place.Upvotes++;
+                break;
+
+            case "REMOVE UPVOTE":
+                user.postsUpvoted.pull(placeId)
+                place.Upvotes--;
+                break;
+
+            case "REMOVE DOWNVOTE ADD UPVOTE":
+                user.postsUpvoted.push(placeId)
+                user.postsDownvoted.pull(placeId)
+                place.Upvotes+=2;
+                break;
+
+            case "ADD DOWNVOTE REMOVE UPVOTE":
+                user.postsDownvoted.push(placeId)
+                user.postsUpvoted.pull(placeId)
+                place.Upvotes-=2;
+                break;
+                
+            case "REMOVE DOWNVOTE":
+                user.postsDownvoted.pull(placeId)
+                place.Upvotes++;
+                break;
+
+            case "ADD DOWNVOTE":
+                user.postsDownvoted.push(placeId)
+                place.Upvotes--;
+                break;
+
+            default:
+                break;
+        }
+        await place.save()
+        await user.save({session: session})
+        await session.commitTransaction()
+    }
+    catch(err){
+        console.log(err)
+        return next(new HttpError("Something went wrong, could not delete the place.", 500))
+    }
+
+    res.status(200).json({"message": "Removed"})
 }
 
 const updatePlace = async (req, res, next) => {
@@ -143,7 +225,8 @@ const deletePlace = async (req, res, next) => {
         return next(new HttpError("Something went wrong, could not delete the place.", 500))
     }
 
-    if (place.creator.toString() !== req.userData.userId) {
+    if (place.creator.id !== req.userData.userId) {
+       
         return next(new HttpError("Invalid user! You are not allowed to update this place.", 401))
     }
 
@@ -182,5 +265,6 @@ const deletePlace = async (req, res, next) => {
 exports.getUserPlacesbyId = getUserPlacesbyId
 exports.getPlacebyId = getPlacebyId
 exports.createPlace = createPlace
+exports.upvotePlace = upvotePlace
 exports.updatePlace = updatePlace
 exports.deletePlace = deletePlace

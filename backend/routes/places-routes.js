@@ -15,6 +15,8 @@ router.use(checkAuth)
 
 router.post("/",fileUpload.single('image'),[check('name').not().isEmpty(), check('caption').not().isEmpty()], placesController.createPlace)
 
+router.post("/:pid/upvote", placesController.upvotePlace)
+
 router.patch("/:pid",[check('name').not().isEmpty(), check('caption').not().isEmpty()], placesController.updatePlace)
 
 router.delete("/:pid", placesController.deletePlace)

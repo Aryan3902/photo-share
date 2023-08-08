@@ -20,6 +20,11 @@ const placeSchema = new Schema({
     required: true,
     ref: "User",
   },
+  Upvotes: {
+    type: Number,
+    required: true,
+    ref: "User"
+  }
 });
 
 module.exports = mongoose.model("Place", placeSchema);

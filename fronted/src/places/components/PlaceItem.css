@@ -1,10 +1,14 @@
+:root{
+  --light-cream: rgb(255, 249, 213);
+}
+
 .card {
     width: 500px;
-    border: 1px solid #ccc;
+    border: 5px solid var(--light-cream);
     border-radius: 5px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     overflow: hidden;
-    margin: 20px;
   }
   
   .card img {
@@ -44,4 +48,34 @@
 .map-container{
   height: 200px;
   width: 100%;
+}
+
+.post-container{
+  display: flex;
+}
+
+.post__options-tab{
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: var(--light-cream);
+}
+
+.place__post-options{
+  font-size: 25px;
+  margin: 10px;
+  color: black;
+  text-align: center;
+}
+
+.place__post-options:hover{
+  cursor: pointer;
+}
+
+p.place__post-options {
+  font-size: 20px;
+  font-weight: bolder;
+  margin: 0;
 }

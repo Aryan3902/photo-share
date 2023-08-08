@@ -131,12 +131,16 @@ const login = async (req, res, next) => {
     } catch (err){
         return next(new HttpError("Signing up failed, please try again", 500))
     }
-
-    res.json({userId: existingUser.id, 
-        email: existingUser.email
-        ,token: token} )
+    console.log(existingUser)
+    res.json({
+        userId: existingUser.id, 
+        email: existingUser.email,
+        token: token,
+        upvotes: existingUser.postsUpvoted.toObject(),
+        downvotes: existingUser.postsDownvoted.toObject()
+    })
 }
 
 exports.getUsers = getUsers
 exports.signUp = signUp
-exports.login = login 
+exports.login = login
